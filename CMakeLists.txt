@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pointengine)
+project(PointEngine)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
@@ -10,11 +10,17 @@ add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(vendored/SDL_image EXCLUDE_FROM_ALL)
 add_subdirectory(vendored/SDL_ttf EXCLUDE_FROM_ALL)
 
-add_executable(pointengine)
+# add_compile_options(-fsanitize=address -g)
+# add_link_options(-fsanitize=address)
 
-target_sources(pointengine
+add_executable(PointEngine)
+add_library(PElib source/PointEngine.c)
+
+target_sources(PointEngine
     PRIVATE
-        main.c
+        source/main.c
+
 )
 
-target_link_libraries(pointengine PRIVATE SDL3_image::SDL3_image SDL3::SDL3 SDL3_ttf::SDL3_ttf m)
+target_link_libraries(PointEngine PRIVATE SDL3_image::SDL3_image SDL3::SDL3 SDL3_ttf::SDL3_ttf PElib m)
+target_link_libraries(PElib       PRIVATE SDL3_image::SDL3_image SDL3::SDL3 SDL3_ttf::SDL3_ttf m)
