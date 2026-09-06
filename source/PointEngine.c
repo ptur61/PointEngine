@@ -1,7 +1,30 @@
+/** 
+ MIT License
+
+Copyright (c) 2026 Paul Turner
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -50,11 +73,7 @@ bool peCreateInstance(char name[], int width, int height) {
         if (SDL_CreateWindowAndRenderer(name, width, height, 0, &peWindow, &peRenderer) == false ) {
             SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
             success = false;
-        } else if (TTF_Init() == false) {
-            SDL_Log("SDL_ttf could not initialise! SDL_ttf error: %s\n", SDL_GetError());
-            success = false;
-        }
-    }
+        }     }
     return success;
 }
 
@@ -91,9 +110,9 @@ static p3 get_plane_normal(p3 VA[3]) {
     return normal;
 }
 
-static uint8_t is_plane_backface(p3 plane[3]) {
-    p3 N = get_plane_normal(plane);
-    p3 V = plane[0];  // Arbitrary vector from the plane
+static uint8_t is_plane_backface(p3 VA[3]) {
+    p3 N = get_plane_normal(VA);
+    p3 V = VA[0];  // Arbitrary vector from the plane
     double D = N.x*V.x + N.y*V.y + N.z*V.z;
     if (D > 0) {
         return 0;
@@ -124,24 +143,8 @@ void peLineDraw(p3 pA, p3 pB) {
     //  TRANSLATION & ROTATION
     //  --------------------------------------------------------------------------
 
-    p3 pePointTranslate(p3 p, p3 v) {
-        p3 point = { p.x + v.x, p.y + v.y, p.z + v.z };
-        return point;
-    }
-
-    p3 pePointRotateXY(p3 p, double r) {
-        p3 point;
-        point.x = p.x * cos(PI/180 * r) - p.y * sin(PI/180 * r);
-        point.z = p.z;
-        point.y = p.x * sin(PI/180 * r) + p.y * cos(PI/180 * r);
-        return point;
-    }
-
-    p3 pePointRotateXZ(p3 p, double r) {
-        p3 point;
-        point.x = p.x * cos(PI/180 * r) + p.z * sin(PI/180 * r);
-        point.z = p.x * -sin(PI/180 * r) + p.z * cos(PI/180 * r);
-        point.y = p.y;
+    p3 pePointTranslate(p3 src, p3 v) {
+        p3 point = { src.x + v.x, src.y + v.y, src.z + v.z };
         return point;
     }
 
@@ -152,6 +155,22 @@ void peLineDraw(p3 pA, p3 pB) {
         pnt.z = ( src.x * -sin(y) ) + ( src.y * cos(y) * sin(x) ) + ( src.z * cos(y) * cos(x) );
         return pnt;
     }       
+
+    // p3 pePointRotateXY(p3 p, double r) {
+    //     p3 point;
+    //     point.x = p.x * cos(PI/180 * r) - p.y * sin(PI/180 * r);
+    //     point.z = p.z;
+    //     point.y = p.x * sin(PI/180 * r) + p.y * cos(PI/180 * r);
+    //     return point;
+    // }
+
+    // p3 pePointRotateXZ(p3 p, double r) {
+    //     p3 point;
+    //     point.x = p.x * cos(PI/180 * r) + p.z * sin(PI/180 * r);
+    //     point.z = p.x * -sin(PI/180 * r) + p.z * cos(PI/180 * r);
+    //     point.y = p.y;
+    //     return point;
+    //}
 
 
 
@@ -177,23 +196,23 @@ shape peShapeCopy(shape src, int size) {
     return shp;
 }
 
-//Not needed if malloc isn't used
+// Not needed if malloc isn't used
 void peShapeDelete(shape tgt) {
     free(tgt.VA);
 }
 
-p3 peShapeGetCOG(shape s) {
+p3 peShapeGetCOG(shape src) {
     // cog: centre of gravity
     double x, y, z;
-    for (int i = 0; i < s.size; i++) {
-            p3 point = s.VA[i];
+    for (int i = 0; i < src.size; i++) {
+            p3 point = src.VA[i];
             x += point.x;
             y += point.y;
             z += point.z;
     }
-    x /= s.size;
-    y /= s.size;
-    z /= s.size;
+    x /= src.size;
+    y /= src.size;
+    z /= src.size;
     p3 cog = {x, y, z};
     return cog;
 }
@@ -236,17 +255,17 @@ void peShapeDraw(shape src, uint8_t backface_culling) {
         return shp;
     }
 
-    shape peShapeRotateXZ(shape tgt, p3 p, double r) {  // NOT MEMORY SAFE
-        shape shp = peShapeCopy(tgt, tgt.size);
-        p3 npivot = { -p.x, -p.y, -p.z };
-        shp = peShapeTranslate(shp, npivot);
-        for (int i = 0; i < shp.size; i++) {
-            p3 point  = shp.VA[i];
-            shp.VA[i] = pePointRotateXZ(point, r);
-        }
-        shp = peShapeTranslate(shp, p);
-        return shp;
-    }
+    // shape peShapeRotateXZ(shape tgt, p3 p, double r) {  // NOT MEMORY SAFE
+    //     shape shp = peShapeCopy(tgt, tgt.size);
+    //     p3 npivot = { -p.x, -p.y, -p.z };
+    //     shp = peShapeTranslate(shp, npivot);
+    //     for (int i = 0; i < shp.size; i++) {
+    //         p3 point  = shp.VA[i];
+    //         shp.VA[i] = pePointRotateXZ(point, r);
+    //     }
+    //     shp = peShapeTranslate(shp, p);
+    //     return shp;
+    // }
 
     shape peShapeRotate(shape tgt, p3 pivot, double x, double y, double z) {
         shape shp = peShapeCopy(tgt, tgt.size);
