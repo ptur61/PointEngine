@@ -1,1 +1,0 @@
-/usr/bin/cc -Wl,--dependency-file=CMakeFiles/PointEngine.dir/link.d CMakeFiles/PointEngine.dir/source/main.c.o -o PointEngine  -Wl,-rpath,/home/paul/Documents/Projects/C/sdlstuff/PointEngine/build libPElib.so -lm libSDL3_image.so.0.4.4 libSDL3_ttf.so.0.3.0 libSDL3.so.0.5.0
