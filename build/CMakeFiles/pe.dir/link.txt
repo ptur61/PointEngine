@@ -1,0 +1,2 @@
+/usr/bin/ar qc libpe.a CMakeFiles/pe.dir/src/PointEngine.c.o
+/usr/bin/ranlib libpe.a

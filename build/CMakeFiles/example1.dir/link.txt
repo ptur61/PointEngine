@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/example1.dir/link.d CMakeFiles/example1.dir/src/examples/example1.c.o -o example1  -Wl,-rpath,/home/paul/PointEngine/build/vendored/SDL libpe.a vendored/SDL/libSDL3.so.0.5.0 -lm

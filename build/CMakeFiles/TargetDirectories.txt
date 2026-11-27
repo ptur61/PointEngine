@@ -1,0 +1,10 @@
+/home/paul/PointEngine/build/CMakeFiles/example1.dir
+/home/paul/PointEngine/build/CMakeFiles/example2.dir
+/home/paul/PointEngine/build/CMakeFiles/pe.dir
+/home/paul/PointEngine/build/CMakeFiles/edit_cache.dir
+/home/paul/PointEngine/build/CMakeFiles/rebuild_cache.dir
+/home/paul/PointEngine/build/vendored/SDL/CMakeFiles/SDL3-shared.dir
+/home/paul/PointEngine/build/vendored/SDL/CMakeFiles/SDL3_test.dir
+/home/paul/PointEngine/build/vendored/SDL/CMakeFiles/SDL_uclibc.dir
+/home/paul/PointEngine/build/vendored/SDL/CMakeFiles/edit_cache.dir
+/home/paul/PointEngine/build/vendored/SDL/CMakeFiles/rebuild_cache.dir

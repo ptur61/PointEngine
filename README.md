@@ -15,15 +15,17 @@ The system is built using points, or vertices, where a collection of vertices is
 
 ## How to run the demo
 
+### With CMake
+Compiling with CMake is recommended.
+```cmake -B build```
+```cmake --build build```
+Executables can be found in /build
+
+### With GCC
 I have compiled the software on my Linux machine using GCC. Please note that SDL3 (https://wiki.libsdl.org/SDL3/FrontPage) is required.
 The compile.sh file will compile the software if your SDL3 library is located at /usr/local/lib. Otherwise, change the path stated in the file to the location of 
 your SDL3 install, or use another method of compilation. The demo files included are:
-    * example_1.c
-    * example_2.c
-
-You can run the demo files by executing the bash file run.sh with the file number you wish to open. For example, to open example_1, you would write in your command line 
-```
-bash run.sh 1
-```
+    * example1.c
+    * example2.c
 
 Please contact me if there are any problems (ptur61@gmail.com)
